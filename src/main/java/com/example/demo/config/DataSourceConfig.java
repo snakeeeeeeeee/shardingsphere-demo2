@@ -10,6 +10,7 @@ import org.apache.shardingsphere.api.config.sharding.strategy.InlineShardingStra
 import org.apache.shardingsphere.api.config.sharding.strategy.StandardShardingStrategyConfiguration;
 import org.apache.shardingsphere.shardingjdbc.api.ShardingDataSourceFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -32,81 +33,81 @@ public class DataSourceConfig {
 
     private static final String MAPPER_LOCATION = "classpath*:mapper/**/*Mapper.xml";
 
-    @Bean("shardingDataSource")
-    @ConditionalOnMissingBean(name = "shardingDataSource")
-    public DataSource getShardingDataSource() throws SQLException {
-        ShardingRuleConfiguration shardingRuleConfig = new ShardingRuleConfiguration();
-        Collection<TableRuleConfiguration> tableRuleConfigs = shardingRuleConfig.getTableRuleConfigs();
+//    @Bean("shardingDataSource")
+//    @ConditionalOnMissingBean(name = "shardingDataSource")
+//    public DataSource getShardingDataSource() throws SQLException {
+//        ShardingRuleConfiguration shardingRuleConfig = new ShardingRuleConfiguration();
+//        Collection<TableRuleConfiguration> tableRuleConfigs = shardingRuleConfig.getTableRuleConfigs();
+//
+//        //user分表配置
+//        TableRuleConfiguration userTableRuleConfig = new TableRuleConfiguration("user", "ds0.user_${0..1}");
+//        userTableRuleConfig.setTableShardingStrategyConfig(new StandardShardingStrategyConfiguration("id", getUserPreciseShardingAlgorithm()));
+//
+//        //playlist 分表策略
+//        TableRuleConfiguration playlistTableRuleConfig = new TableRuleConfiguration("playlist", "ds0.playlist_${0..1}");
+//        playlistTableRuleConfig.setTableShardingStrategyConfig(new StandardShardingStrategyConfiguration("playlist_id", getPlaylistPreciseShardingAlgorithm()));
+//
+//        //分片规则
+//        tableRuleConfigs.add(playlistTableRuleConfig);
+//        tableRuleConfigs.add(userTableRuleConfig);
+//
+//        //默认分组
+//        shardingRuleConfig.getBindingTableGroups().add("playlist");
+//        shardingRuleConfig.setDefaultTableShardingStrategyConfig(new StandardShardingStrategyConfiguration("playlist_id", getPlaylistPreciseShardingAlgorithm()));
+//
+//        Properties properties = new Properties();
+//        properties.setProperty("sql.show", "true");
+//        return ShardingDataSourceFactory.createDataSource(getDataSourceMap(), shardingRuleConfig, properties);
+//    }
 
-        //user分表配置
-        TableRuleConfiguration userTableRuleConfig = new TableRuleConfiguration("user", "ds0.user_${0..1}");
-        userTableRuleConfig.setTableShardingStrategyConfig(new StandardShardingStrategyConfiguration("id", getUserPreciseShardingAlgorithm()));
+//    @Bean
+//    public DemoPlaylistPreciseShardingAlgorithm getPlaylistPreciseShardingAlgorithm() {
+//        return new DemoPlaylistPreciseShardingAlgorithm();
+//    }
+//
+//    @Bean
+//    public DemoUserPreciseShardingAlgorithm getUserPreciseShardingAlgorithm() {
+//        return new DemoUserPreciseShardingAlgorithm();
+//    }
+//
+//    @Bean
+//    public KeyGeneratorConfiguration getPlaylistIdKeyGeneratorConfiguration() {
+//        return new KeyGeneratorConfiguration("SNOWFLAKE", "playlist_id");
+//    }
 
-        //playlist 分表策略
-        TableRuleConfiguration playlistTableRuleConfig = new TableRuleConfiguration("playlist", "ds0.playlist_${0..1}");
-        playlistTableRuleConfig.setTableShardingStrategyConfig(new StandardShardingStrategyConfiguration("playlist_id", getPlaylistPreciseShardingAlgorithm()));
+//    Map<String, DataSource> getDataSourceMap() {
+//        Map<String, DataSource> result = new HashMap<>();
+//        result.put("ds0", getDs0DataSource());
+//        return result;
+//    }
 
-        //分片规则
-        tableRuleConfigs.add(playlistTableRuleConfig);
-        tableRuleConfigs.add(userTableRuleConfig);
-
-        //默认分组
-        shardingRuleConfig.getBindingTableGroups().add("playlist");
-        shardingRuleConfig.setDefaultTableShardingStrategyConfig(new StandardShardingStrategyConfiguration("playlist_id", getPlaylistPreciseShardingAlgorithm()));
-
-        Properties properties = new Properties();
-        properties.setProperty("sql.show", "true");
-        return ShardingDataSourceFactory.createDataSource(getDataSourceMap(), shardingRuleConfig, properties);
-    }
-
-    @Bean
-    public DemoPlaylistPreciseShardingAlgorithm getPlaylistPreciseShardingAlgorithm() {
-        return new DemoPlaylistPreciseShardingAlgorithm();
-    }
-
-    @Bean
-    public DemoUserPreciseShardingAlgorithm getUserPreciseShardingAlgorithm() {
-        return new DemoUserPreciseShardingAlgorithm();
-    }
-
-    @Bean
-    public KeyGeneratorConfiguration getPlaylistIdKeyGeneratorConfiguration() {
-        return new KeyGeneratorConfiguration("SNOWFLAKE", "playlist_id");
-    }
-
-    Map<String, DataSource> getDataSourceMap() {
-        Map<String, DataSource> result = new HashMap<>();
-        result.put("ds0", getDs0DataSource());
-        return result;
-    }
-
-    @Bean(name = "ds0DataSource")
-    @ConfigurationProperties(prefix = "spring.datasource.ds0")
-    @ConditionalOnMissingBean(name = "ds0DataSource")
-    @Primary
-    public DataSource getDs0DataSource() {
-        DruidDataSource datasource = new DruidDataSource();
-        List<Filter> filters = new ArrayList<>();
-        //filters.add(wallFilter);
-        datasource.setProxyFilters(filters);
-        return datasource;
-    }
+//    @Bean(name = "ds0DataSource")
+//    @ConfigurationProperties(prefix = "spring.datasource.ds0")
+//    @ConditionalOnMissingBean(name = "ds0DataSource")
+//    @Primary
+//    public DataSource getDs0DataSource() {
+//        DruidDataSource datasource = new DruidDataSource();
+//        List<Filter> filters = new ArrayList<>();
+//        //filters.add(wallFilter);
+//        datasource.setProxyFilters(filters);
+//        return datasource;
+//    }
 
 
     @Bean(name = "ds0TransactionManager")
     @ConditionalOnBean(name = "shardingDataSource")
     @Primary
-    public DataSourceTransactionManager ds0TransactionManager(@Qualifier("shardingDataSource") DataSource ds0DataSource) {
-        return new DataSourceTransactionManager(ds0DataSource);
+    public DataSourceTransactionManager ds0TransactionManager(@Qualifier("shardingDataSource") DataSource shardingDataSource) {
+        return new DataSourceTransactionManager(shardingDataSource);
     }
 
     @Bean(name = "ds0SqlSessionFactory")
     @ConditionalOnMissingBean(name = "ds0SqlSessionFactory")
     @Primary
-    public SqlSessionFactory ds0SqlSessionFactory(@Qualifier("shardingDataSource") DataSource ds0DataSource)
+    public SqlSessionFactory ds0SqlSessionFactory(@Qualifier("shardingDataSource") DataSource shardingDataSource)
             throws Exception {
         SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
-        sessionFactory.setDataSource(ds0DataSource);
+        sessionFactory.setDataSource(shardingDataSource);
         sessionFactory.setMapperLocations(new PathMatchingResourcePatternResolver()
                 .getResources(MAPPER_LOCATION));
         sessionFactory.setTypeAliasesPackage("com.example.demo.domain");
